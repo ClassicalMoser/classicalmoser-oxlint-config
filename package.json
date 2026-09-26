@@ -1,0 +1,25 @@
+{
+  "name": "classicalmoser-oxlint-config",
+  "version": "0.0.1",
+  "description": "Shared strict oxlint standard for ClassicalMoser projects",
+  "license": "ISC",
+  "author": "ClassicalMoser",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "types": "./src/index.ts",
+  "peerDependencies": {
+    "eslint-plugin-import-boundaries": "*",
+    "eslint-plugin-solid": "*",
+    "oxlint": ">=1.62.0"
+  },
+  "peerDependenciesMeta": {
+    "eslint-plugin-import-boundaries": {
+      "optional": true
+    },
+    "eslint-plugin-solid": {
+      "optional": true
+    }
+  }
+}
