@@ -12,7 +12,9 @@ export const rules: Record<string, unknown> = {
   'no-negated-condition': 'off',
   'no-optional-chaining': 'off',
   'no-rest-spread-properties': 'off',
+  'one-var': 'off', // Forces combined declarations; hostile to const/let-per-binding and sequential init.
   'require-await': 'off',
+  'node/no-top-level-await': 'off', // ESM top-level await is intentional and supported.
   'import/no-unassigned-import': 'off',
   'jsdoc/require-param': 'off',
   'jsdoc/require-returns': 'off',
@@ -25,9 +27,11 @@ export const rules: Record<string, unknown> = {
   'complexity': 'off', // Consider changing if team size increases and arbitrary limits are needed.
   'id-length': 'off', // Good idea but too strict to be practical.
   'max-dependencies': 'off', // Consider changing if team size increases and arbitrary limits are needed.
+  'max-nested-callbacks': 'off', // Closure-based composable style nests callbacks by design.
   'max-statements': 'off', // Consider changing if team size increases and arbitrary limits are needed.
   'max-lines': 'off', // Consider changing if team size increases and arbitrary limits are needed.
   'max-lines-per-function': 'off', // Consider changing if team size increases and arbitrary limits are needed.
+  'unicorn/max-nested-calls': 'off', // Same: nested calls are normal in composable closure pipelines.
   'no-duplicate-imports': 'off', // Superseded by import/no-duplicates
   'no-fallthrough': 'off', // Fallthrough is allowed to reduce repetition in switch statements.
   'no-loop-func': 'off', // The use of "var" is prohibited, so this rule is mostly extraneous.
