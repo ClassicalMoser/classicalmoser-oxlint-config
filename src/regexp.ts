@@ -1,3 +1,13 @@
+/**
+ * JS plugin: eslint-plugin-regexp.
+ *
+ * Not covered by oxlint categories (JS plugin rules are opt-in). This is the
+ * recommended high-signal regexp set — correctness/perf at error, a few
+ * stylistic heuristics at warn.
+ *
+ * Diff against upstream when bumping the peer:
+ * https://github.com/ota-meshi/eslint-plugin-regexp/blob/master/lib/configs/rules/recommended.ts
+ */
 export const regexpJsPlugins: string[] = ['eslint-plugin-regexp'];
 
 export const regexpRules: Record<string, unknown> = {

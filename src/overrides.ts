@@ -1,30 +1,35 @@
 import type { OxlintOverride } from 'oxlint';
 
-/** File-type overrides shared by every consumer, independent of boundaries/jsx. */
+/**
+ * File-glob overlays on top of the global rule set.
+ *
+ * Global opinions (`off`): `opinions.ts`.
+ * Global tuned options: `configuredRules.ts`.
+ * Optional boundaries / JSX overlays are added in `createOxlintConfig`.
+ */
 export const baseOverrides: OxlintOverride[] = [
   {
+    // All JS/TS sources: Node callback naming + softer JSDoc signal.
     files: ['**/*.?([cm])[jt]s?(x)'],
     rules: {
+      // Default pattern is only `err`; accept `error` as well.
       'node/handle-callback-err': ['error', '^(err|error)$'],
-      'node/no-exports-assign': 'error',
-      'node/no-new-require': 'error',
-      'node/no-path-concat': 'error',
+      // Categories put these at error; warn is enough when JSDoc is sparse.
       'jsdoc/check-access': 'warn',
       'jsdoc/check-property-names': 'warn',
       'jsdoc/empty-tags': 'warn',
       'jsdoc/implements-on-classes': 'warn',
       'jsdoc/no-defaults': 'warn',
-      'jsdoc/require-param-name': 'warn',
       'jsdoc/require-property': 'warn',
       'jsdoc/require-property-description': 'warn',
       'jsdoc/require-property-name': 'warn',
-      'jsdoc/require-returns-description': 'warn',
     },
-    plugins: ['node', 'jsdoc'],
   },
   {
+    // TypeScript sources: disable JS rules TS already covers, then TS-specific policy.
     files: ['**/*.?([cm])ts', '**/*.?([cm])tsx'],
     rules: {
+      // These flag programs TypeScript rejects as syntax/type errors anyway.
       'constructor-super': 'off',
       'no-class-assign': 'off',
       'no-const-assign': 'off',
@@ -33,16 +38,21 @@ export const baseOverrides: OxlintOverride[] = [
       'no-import-assign': 'off',
       'no-new-native-nonconstructor': 'off',
       'no-obj-calls': 'off',
+      'no-setter-return': 'off',
+      'no-this-before-super': 'off',
+      'no-unsafe-negation': 'off',
+      'no-with': 'off',
+      // Empty constructors are normal when a subclass only sets parameter properties.
+      'no-useless-constructor': 'off',
+
+      // Do not treat shadowing of builtins (e.g. `name`, `status`) as redeclare.
       'no-redeclare': [
         'error',
         {
           builtinGlobals: false,
         },
       ],
-      'no-setter-return': 'off',
-      'no-this-before-super': 'off',
-      'no-unsafe-negation': 'off',
-      'no-with': 'off',
+      // Require const when the whole destructuring is never reassigned.
       'prefer-const': [
         'error',
         {
@@ -50,113 +60,59 @@ export const baseOverrides: OxlintOverride[] = [
           ignoreReadBeforeAssign: true,
         },
       ],
-      'no-unused-expressions': [
-        'error',
-        {
-          allowShortCircuit: true,
-          allowTaggedTemplates: true,
-          allowTernary: true,
-        },
-      ],
-      'no-unused-vars': 'off',
-      'no-useless-constructor': 'off',
+      // Allow function/class hoisting idioms; still flag use-before-define for vars.
       'no-use-before-define': [
         'error',
         {
           classes: false,
           functions: false,
-          variables: true,
         },
       ],
-      'typescript/ban-ts-comment': [
-        'error',
-        {
-          'ts-expect-error': 'allow-with-description',
-        },
-      ],
-      'typescript/no-duplicate-enum-values': 'error',
+
+      // `@ts-expect-error` / `@ts-ignore` / etc. — default options already require descriptions.
+      'typescript/ban-ts-comment': 'error',
+      // Dynamic delete on maps/records is an accepted pattern here.
       'typescript/no-dynamic-delete': 'off',
+      // Empty interfaces are used as extension/branding points.
       'typescript/no-empty-object-type': [
         'error',
         {
           allowInterfaces: 'always',
         },
       ],
-      'typescript/consistent-type-definitions': ['error', 'interface'],
+      // Prefer `import type`, but allow `import('pkg').Type` type annotations.
       'typescript/consistent-type-imports': [
         'error',
         {
           disallowTypeAnnotations: false,
-          fixStyle: 'separate-type-imports',
-          prefer: 'type-imports',
         },
       ],
     },
-    plugins: ['typescript'],
   },
   {
+    // Ambient declaration files often look "empty" to import/unambiguous.
     files: ['**/*.d.ts'],
     rules: {
       'import/unambiguous': 'off',
     },
-    plugins: ['typescript'],
   },
   {
+    // Vitest style only — no debt-relief disables (any / non-null stay on).
     files: ['**/*.test.ts'],
     rules: {
-      // Temporarily allowed while tests are being rewritten
-      // Should be turned back on one by one.
-      // Where bad type assertions are required for runtime checking tests,
-      // Exceptions should be made inline, not globally.
-      'typescript/no-explicit-any': 'off',
-      'typescript/no-non-null-assertion': 'off',
-      'typescript/no-unsafe-type-assertion': 'off',
-
       'vitest/consistent-test-it': [
         'error',
         {
           fn: 'it',
-          withinDescribe: 'it',
         },
       ],
-      // Prefer strict toBe(true)/toBe(false); falsy/truthy also match 0, '', null, etc.
+      // Prefer toBe(true)/toBe(false); truthy/falsy also match 0, '', null, etc.
       'vitest/prefer-to-be-truthy': 'off',
       'vitest/prefer-to-be-falsy': 'off',
     },
-    plugins: ['vitest', 'typescript'],
   },
   {
-    files: ['**/*.json', '**/*.json5', '**/*.jsonc'],
-    rules: {
-      'jsonc/no-bigint-literals': 'error',
-      'jsonc/no-binary-expression': 'error',
-      'jsonc/no-binary-numeric-literals': 'error',
-      'jsonc/no-dupe-keys': 'error',
-      'jsonc/no-escape-sequence-in-identifier': 'error',
-      'jsonc/no-floating-decimal': 'error',
-      'jsonc/no-hexadecimal-numeric-literals': 'error',
-      'jsonc/no-infinity': 'error',
-      'jsonc/no-multi-str': 'error',
-      'jsonc/no-nan': 'error',
-      'jsonc/no-number-props': 'error',
-      'jsonc/no-numeric-separators': 'error',
-      'jsonc/no-octal': 'error',
-      'jsonc/no-octal-escape': 'error',
-      'jsonc/no-octal-numeric-literals': 'error',
-      'jsonc/no-parenthesized': 'error',
-      'jsonc/no-plus-sign': 'error',
-      'jsonc/no-regexp-literals': 'error',
-      'jsonc/no-sparse-arrays': 'error',
-      'jsonc/no-template-literals': 'error',
-      'jsonc/no-undefined-value': 'error',
-      'jsonc/no-unicode-codepoint-escapes': 'error',
-      'jsonc/no-useless-escape': 'error',
-      'jsonc/space-unary-ops': 'error',
-      'jsonc/valid-json-number': 'error',
-    },
-    jsPlugins: ['eslint-plugin-jsonc'],
-  },
-  {
+    // package.json key order used across ClassicalMoser repos (packageManager last).
     files: ['**/package.json'],
     rules: {
       'jsonc/sort-array-values': [
@@ -172,243 +128,55 @@ export const baseOverrides: OxlintOverride[] = [
         'error',
         {
           order: [
-            'publisher',
             'name',
-            'displayName',
-            'type',
             'version',
             'private',
-            'packageManager',
+            'type',
             'description',
             'author',
-            'contributors',
             'license',
-            'funding',
             'homepage',
             'repository',
             'bugs',
             'keywords',
-            'categories',
-            'sideEffects',
-            'imports',
             'exports',
             'main',
             'module',
-            'unpkg',
-            'jsdelivr',
             'types',
-            'typesVersions',
-            'bin',
-            'icon',
             'files',
             'engines',
-            'activationEvents',
-            'contributes',
             'scripts',
             'peerDependencies',
             'peerDependenciesMeta',
             'dependencies',
             'optionalDependencies',
             'devDependencies',
-            'pnpm',
-            'overrides',
-            'resolutions',
-            'husky',
-            'simple-git-hooks',
-            'lint-staged',
-            'eslintConfig',
+            'publishConfig',
+            'volta',
+            'packageManager',
           ],
           pathPattern: '^$',
         },
         {
+          // Keep dependency maps alphabetized regardless of top-level order.
           order: {
             type: 'asc',
           },
-          pathPattern:
-            '^(?:dev|peer|optional|bundled)?[Dd]ependencies(Meta)?$',
-        },
-        {
-          order: {
-            type: 'asc',
-          },
-          pathPattern: '^(?:resolutions|overrides|pnpm.overrides)$',
-        },
-        {
-          order: {
-            type: 'asc',
-          },
-          pathPattern: '^workspaces\\.catalog$',
-        },
-        {
-          order: {
-            type: 'asc',
-          },
-          pathPattern: '^workspaces\\.catalogs\\.[^.]+$',
+          pathPattern: '^(?:dev|peer|optional|bundled)?[Dd]ependencies(Meta)?$',
         },
         {
           order: ['types', 'import', 'require', 'default'],
           pathPattern: '^exports.*$',
         },
-        {
-          order: [
-            'pre-commit',
-            'prepare-commit-msg',
-            'commit-msg',
-            'post-commit',
-            'pre-rebase',
-            'post-rewrite',
-            'post-checkout',
-            'post-merge',
-            'pre-push',
-            'pre-auto-gc',
-          ],
-          pathPattern: '^(?:gitHooks|husky|simple-git-hooks)$',
-        },
       ],
     },
-    jsPlugins: ['eslint-plugin-jsonc'],
   },
   {
-    files: ['**/[jt]sconfig.json', '**/[jt]sconfig.*.json'],
-    rules: {
-      'jsonc/sort-keys': [
-        'error',
-        {
-          order: [
-            'extends',
-            'compilerOptions',
-            'references',
-            'files',
-            'include',
-            'exclude',
-          ],
-          pathPattern: '^$',
-        },
-        {
-          order: [
-            'incremental',
-            'composite',
-            'tsBuildInfoFile',
-            'disableSourceOfProjectReferenceRedirect',
-            'disableSolutionSearching',
-            'disableReferencedProjectLoad',
-            'target',
-            'jsx',
-            'jsxFactory',
-            'jsxFragmentFactory',
-            'jsxImportSource',
-            'lib',
-            'moduleDetection',
-            'noLib',
-            'reactNamespace',
-            'useDefineForClassFields',
-            'emitDecoratorMetadata',
-            'experimentalDecorators',
-            'libReplacement',
-            'baseUrl',
-            'rootDir',
-            'rootDirs',
-            'customConditions',
-            'module',
-            'moduleResolution',
-            'moduleSuffixes',
-            'noResolve',
-            'paths',
-            'resolveJsonModule',
-            'resolvePackageJsonExports',
-            'resolvePackageJsonImports',
-            'typeRoots',
-            'types',
-            'allowArbitraryExtensions',
-            'allowImportingTsExtensions',
-            'allowUmdGlobalAccess',
-            'allowJs',
-            'checkJs',
-            'maxNodeModuleJsDepth',
-            'strict',
-            'strictBindCallApply',
-            'strictFunctionTypes',
-            'strictNullChecks',
-            'strictPropertyInitialization',
-            'allowUnreachableCode',
-            'allowUnusedLabels',
-            'alwaysStrict',
-            'exactOptionalPropertyTypes',
-            'noFallthroughCasesInSwitch',
-            'noImplicitAny',
-            'noImplicitOverride',
-            'noImplicitReturns',
-            'noImplicitThis',
-            'noPropertyAccessFromIndexSignature',
-            'noUncheckedIndexedAccess',
-            'noUnusedLocals',
-            'noUnusedParameters',
-            'useUnknownInCatchVariables',
-            'declaration',
-            'declarationDir',
-            'declarationMap',
-            'downlevelIteration',
-            'emitBOM',
-            'emitDeclarationOnly',
-            'importHelpers',
-            'importsNotUsedAsValues',
-            'inlineSourceMap',
-            'inlineSources',
-            'mapRoot',
-            'newLine',
-            'noEmit',
-            'noEmitHelpers',
-            'noEmitOnError',
-            'outDir',
-            'outFile',
-            'preserveConstEnums',
-            'preserveValueImports',
-            'removeComments',
-            'sourceMap',
-            'sourceRoot',
-            'stripInternal',
-            'allowSyntheticDefaultImports',
-            'esModuleInterop',
-            'forceConsistentCasingInFileNames',
-            'isolatedDeclarations',
-            'isolatedModules',
-            'preserveSymlinks',
-            'verbatimModuleSyntax',
-            'erasableSyntaxOnly',
-            'skipDefaultLibCheck',
-            'skipLibCheck',
-          ],
-          pathPattern: '^compilerOptions$',
-        },
-      ],
-    },
-    jsPlugins: ['eslint-plugin-jsonc'],
-  },
-  {
-    files: ['**/*.y?(a)ml'],
-    rules: {
-      'yml/block-mapping': 'error',
-      'yml/block-sequence': 'error',
-      'yml/no-empty-key': 'error',
-      'yml/no-empty-sequence-entry': 'error',
-      'yml/no-irregular-whitespace': 'error',
-      'yml/plain-scalar': 'error',
-    },
-    jsPlugins: ['eslint-plugin-yml'],
-  },
-  {
-    files: ['**/*.js', '**/*.cjs'],
-    rules: {
-      'typescript/no-require-imports': 'off',
-    },
-    plugins: ['typescript'],
-  },
-  {
+    // Tooling entry files are exempt from library-facing export/return style.
     files: ['**/*.config.ts'],
     rules: {
-      'import/no-default-export': 'off', // Configs usually require a default export
+      'import/no-default-export': 'off',
       'typescript/explicit-function-return-type': 'off',
     },
-    plugins: ['typescript', 'import'],
   },
 ];

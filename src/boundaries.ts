@@ -2,9 +2,12 @@ import type { BoundaryConfig } from 'eslint-plugin-import-boundaries';
 import type { OxlintOverride } from 'oxlint';
 
 /**
- * The repeated shape of the import-boundaries override, standardized on the
- * `src/**` glob (previously some repos scoped to `src/**` and others left it
- * unscoped, which forced them to separately exempt `**.config.ts`).
+ * Opt-in layer import boundaries via eslint-plugin-import-boundaries.
+ *
+ * For any repo with a clear dependency DAG between folders under `src`.
+ * Scoped to `src/**` so config entrypoints outside src need no separate exempt.
+ * Test/mock trees load the same boundary table but with `enforceBoundaries: false`
+ * so fixtures can import across layers without weakening production rules.
  */
 export function createBoundariesOverrides(
   boundaries: BoundaryConfig[],
