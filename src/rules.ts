@@ -29,6 +29,7 @@ export const rules: Record<string, unknown> = {
   'max-lines': 'off', // Consider changing if team size increases and arbitrary limits are needed.
   'max-lines-per-function': 'off', // Consider changing if team size increases and arbitrary limits are needed.
   'no-duplicate-imports': 'off', // Superseded by import/no-duplicates
+  'no-fallthrough': 'off', // Fallthrough is allowed to reduce repetition in switch statements.
   'no-loop-func': 'off', // The use of "var" is prohibited, so this rule is mostly extraneous.
   'no-await-in-loop': 'off', // Await is often entirely reasonable in a loop, especially for dependent logic in a closure.
   'no-magic-numbers': 'off', // Ad-hoc numbers are allowed, particularly in tests.
@@ -39,6 +40,7 @@ export const rules: Record<string, unknown> = {
   'typescript/no-inferrable-types': 'off', // Excessive clarity is preferable to ambiguity
   'import/no-nodejs-modules': 'off', // Codebase is designed only for NPM-compatible environments
   'unicorn/no-array-reduce': 'off', // Reduce is often ideal for this idiom.
+  'unicorn/no-null': 'off', // Null means deliberately empty. Undefined means never set.
   'vitest/require-hook': 'off', // Vitest hooks are not required for tests
   'vitest/no-hooks': 'off', // Vitest hooks can be used for setup and teardown where sensible
   'vitest/prefer-called-once': 'off', // Called times for consistency

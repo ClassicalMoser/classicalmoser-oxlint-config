@@ -1,5 +1,5 @@
 import type { BoundaryConfig } from 'eslint-plugin-import-boundaries';
-import type { LintPlugins, OxlintConfig, OxlintOverride } from 'oxlint';
+import type { OxlintConfig, OxlintOverride } from 'oxlint';
 import { createBoundariesOverrides } from './boundaries.ts';
 import { ignorePatterns } from './ignorePatterns.ts';
 import { jestDisableRules } from './jestDisable.ts';
@@ -19,7 +19,7 @@ export interface OxlintStandardOptions {
   filenameCase?: 'kebabCase' | 'camelCase' | false;
 }
 
-const basePlugins: LintPlugins = [
+const basePlugins = [
   'import',
   'eslint',
   'unicorn',
@@ -29,7 +29,7 @@ const basePlugins: LintPlugins = [
   'promise',
   'typescript',
   'oxc',
-];
+] as const;
 
 const baseJsPlugins = [
   'eslint-plugin-command',
@@ -44,20 +44,20 @@ export function createOxlintConfig(
   const { jsx = false, boundaries, filenameCase = false } = options;
 
   const overrides: OxlintOverride[] = [...baseOverrides];
-  const plugins: LintPlugins = [...basePlugins];
+  const jsxOverlay = jsx ? createJsxOverlay(jsx) : undefined;
 
   if (boundaries) {
     overrides.push(...createBoundariesOverrides(boundaries));
   }
 
-  if (jsx) {
-    const jsxOverlay = createJsxOverlay(jsx);
-    plugins.push(...jsxOverlay.plugins);
+  if (jsxOverlay) {
     overrides.push(...jsxOverlay.overrides);
   }
 
   return {
-    plugins,
+    plugins: jsxOverlay
+      ? [...basePlugins, ...jsxOverlay.plugins]
+      : [...basePlugins],
     jsPlugins: baseJsPlugins,
     categories: {
       correctness: 'error',

@@ -1,9 +1,4 @@
-import type { LintPlugins, OxlintOverride } from 'oxlint';
-
-export interface JsxOverlay {
-  plugins: LintPlugins;
-  overrides: OxlintOverride[];
-}
+import type { OxlintOverride } from 'oxlint';
 
 /**
  * JSX correctness/accessibility, run through oxlint's native `jsx-a11y` plugin
@@ -11,16 +6,16 @@ export interface JsxOverlay {
  * client repo only needs to pass `jsx: 'solid' | 'react'` instead of
  * re-authoring its own overlay file.
  */
-export function createJsxOverlay(framework: 'solid' | 'react'): JsxOverlay {
+export function createJsxOverlay(framework: 'solid' | 'react') {
   if (framework === 'react') {
     return {
-      plugins: ['jsx-a11y', 'react'],
-      overrides: [],
+      plugins: ['jsx-a11y', 'react'] as const,
+      overrides: [] as OxlintOverride[],
     };
   }
 
   return {
-    plugins: ['jsx-a11y'],
+    plugins: ['jsx-a11y'] as const,
     overrides: [
       {
         files: ['src/**/*.ts', 'src/**/*.tsx'],
@@ -52,6 +47,6 @@ export function createJsxOverlay(framework: 'solid' | 'react'): JsxOverlay {
           'solid/jsx-uses-vars': 'off',
         },
       },
-    ],
+    ] satisfies OxlintOverride[],
   };
 }
