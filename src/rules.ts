@@ -22,7 +22,7 @@ export const rules: Record<string, unknown> = {
 
   // Rules with opinions the codebase disagrees with
   // These have specific reasons for being disabled
-  complexity: 'off', // Consider changing if team size increases and arbitrary limits are needed.
+  'complexity': 'off', // Consider changing if team size increases and arbitrary limits are needed.
   'id-length': 'off', // Good idea but too strict to be practical.
   'max-dependencies': 'off', // Consider changing if team size increases and arbitrary limits are needed.
   'max-statements': 'off', // Consider changing if team size increases and arbitrary limits are needed.
