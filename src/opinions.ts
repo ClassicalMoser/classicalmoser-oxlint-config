@@ -33,6 +33,7 @@ export const opinions: Record<string, 'off'> = {
   'jsdoc/require-returns': 'off',
   'jsdoc/require-param-type': 'off',
   'jsdoc/require-returns-type': 'off',
+  'jsdoc/require-throws-type': 'off',
   // Unadulterated nonsense.
   'unicorn/no-negated-condition': 'off',
 
@@ -43,11 +44,14 @@ export const opinions: Record<string, 'off'> = {
    */
   complexity: 'off',
   'id-length': 'off', // Sound in theory; too strict in practice (i, x, _).
+  // Values are too arbitrary. Potentially worth revisiting in the future.
   'max-dependencies': 'off',
   'max-nested-callbacks': 'off',
   'max-statements': 'off',
   'max-lines': 'off',
   'max-lines-per-function': 'off',
+  'max-params': 'off',
+  'max-depth': 'off',
   'unicorn/max-nested-calls': 'off',
   // Core rule superseded by the import plugin's version.
   'no-duplicate-imports': 'off',
@@ -94,6 +98,8 @@ export const opinions: Record<string, 'off'> = {
   'prefer-destructuring': 'off',
   // Import-then-export is fine for barrels that also use the binding.
   'unicorn/prefer-export-from': 'off',
+  // Keep `Number.parseInt` / `parseFloat`; do not force `Number()` / `Math.trunc`.
+  'unicorn/prefer-number-coercion': 'off',
   'prefer-ternary': 'off',
   'sort-keys': 'off',
   // Import layering is enforced by eslint-plugin-import-boundaries when opted in.
